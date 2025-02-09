@@ -23,6 +23,39 @@ mkcd ()
        cd -P -- "$1"
 }
 
+tmux-find () {
+    trap 'exit 0' INT
+    local session=$(tmux ls | fzf )
+    echo "${session%%:*}"
+
+    if [[ -v $session ]]; then
+      echo "session is null"
+      return 1
+    fi
+    local session_to_join="${session%%:*}"
+    tmux a -t "${session%%:*}"
+}
+
+ta () {
+    tmux a -t $1
+}
+
+jf () {
+    if [[ -n "$2" ]]; then 
+        cat $1 | jq > $2
+    else
+        cat $1 | jq > temp.json && mv temp.json $1
+    fi
+}
+
+tnew() {
+    tmux new -s $1
+}
+
+lc() {
+    find . | xargs wc -l
+}
+
 
 alias lsd="ls -d */"
 alias lsdot="ls -d .*"
@@ -34,6 +67,8 @@ alias skool="cd ~/Documents/MCS-DS"
 alias career="cd ~/Documents/career"
 alias learn="cd ~/Documents/learning"
 alias ..="cd .."
+alias find="fd"
+alias vim="nvim"
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
 # a theme from this variable instead of looking in $ZSH/themes/
@@ -94,7 +129,11 @@ alias ..="cd .."
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git)
+plugins=(
+  git
+  dotenv
+  z
+)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -130,3 +169,5 @@ eval "$(fzf --zsh)"
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 neofetch
+
+export PATH="/Applications/ARX-3.9.1.app/Contents/bin:$PATH"
